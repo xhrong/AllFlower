@@ -114,7 +114,6 @@ public class GalleryActivity extends Activity {
         Animation animation;
         if (tvImageDescription.getVisibility() == View.VISIBLE) {
             animation = AnimationUtils.loadAnimation(this, R.anim.gallery_description_hide);
-
             animation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
