@@ -50,8 +50,8 @@
       <file leaf-file-name="GalleryActivity.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/xhr/AllFlower/GalleryActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.18164437" vertical-offset="1805" max-vertical-offset="2793">
-              <caret line="115" column="92" selection-start-line="115" selection-start-column="92" selection-end-line="115" selection-end-column="92" />
+            <state vertical-scroll-proportion="0.21797323" vertical-offset="1805" max-vertical-offset="2812">
+              <caret line="116" column="12" selection-start-line="116" selection-start-column="12" selection-end-line="116" selection-end-column="12" />
               <folding>
                 <element signature="e#887#898#0" expanded="true" />
                 <element signature="e#1874#2157#0" expanded="true" />
@@ -60,10 +60,10 @@
                 <element signature="e#2545#2546#0" expanded="true" />
                 <element signature="e#2718#2935#0" expanded="true" />
                 <element signature="e#2924#2925#0" expanded="true" />
-                <element signature="e#4653#4654#0" expanded="true" />
-                <element signature="e#4741#4742#0" expanded="true" />
-                <element signature="e#5213#5214#0" expanded="true" />
-                <element signature="e#5299#5300#0" expanded="true" />
+                <element signature="e#4666#4667#0" expanded="true" />
+                <element signature="e#4754#4755#0" expanded="true" />
+                <element signature="e#5226#5227#0" expanded="true" />
+                <element signature="e#5312#5313#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -866,12 +866,12 @@
       <updated>1411018729546</updated>
       <workItem from="1411018733099" duration="18405000" />
       <workItem from="1411118233217" duration="1323000" />
-      <workItem from="1411368278338" duration="8475000" />
+      <workItem from="1411368278338" duration="8498000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="28203000" />
+    <option name="totallyTimeSpent" value="28226000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
@@ -954,10 +954,10 @@
             <element signature="e#2545#2546#0" expanded="true" />
             <element signature="e#2718#2935#0" expanded="true" />
             <element signature="e#2924#2925#0" expanded="true" />
-            <element signature="e#4653#4654#0" expanded="true" />
-            <element signature="e#4741#4742#0" expanded="true" />
-            <element signature="e#5213#5214#0" expanded="true" />
-            <element signature="e#5299#5300#0" expanded="true" />
+            <element signature="e#4666#4667#0" expanded="true" />
+            <element signature="e#4754#4755#0" expanded="true" />
+            <element signature="e#5226#5227#0" expanded="true" />
+            <element signature="e#5312#5313#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1044,10 +1044,10 @@
             <element signature="e#2545#2546#0" expanded="true" />
             <element signature="e#2718#2935#0" expanded="true" />
             <element signature="e#2924#2925#0" expanded="true" />
-            <element signature="e#4653#4654#0" expanded="true" />
-            <element signature="e#4741#4742#0" expanded="true" />
-            <element signature="e#5213#5214#0" expanded="true" />
-            <element signature="e#5299#5300#0" expanded="true" />
+            <element signature="e#4666#4667#0" expanded="true" />
+            <element signature="e#4754#4755#0" expanded="true" />
+            <element signature="e#5226#5227#0" expanded="true" />
+            <element signature="e#5312#5313#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1404,8 +1404,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xhr/AllFlower/GalleryActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.18164437" vertical-offset="1805" max-vertical-offset="2793">
-          <caret line="115" column="92" selection-start-line="115" selection-start-column="92" selection-end-line="115" selection-end-column="92" />
+        <state vertical-scroll-proportion="0.21797323" vertical-offset="1805" max-vertical-offset="2812">
+          <caret line="116" column="12" selection-start-line="116" selection-start-column="12" selection-end-line="116" selection-end-column="12" />
           <folding>
             <element signature="e#887#898#0" expanded="true" />
             <element signature="e#1874#2157#0" expanded="true" />
@@ -1414,10 +1414,10 @@
             <element signature="e#2545#2546#0" expanded="true" />
             <element signature="e#2718#2935#0" expanded="true" />
             <element signature="e#2924#2925#0" expanded="true" />
-            <element signature="e#4653#4654#0" expanded="true" />
-            <element signature="e#4741#4742#0" expanded="true" />
-            <element signature="e#5213#5214#0" expanded="true" />
-            <element signature="e#5299#5300#0" expanded="true" />
+            <element signature="e#4666#4667#0" expanded="true" />
+            <element signature="e#4754#4755#0" expanded="true" />
+            <element signature="e#5226#5227#0" expanded="true" />
+            <element signature="e#5312#5313#0" expanded="true" />
           </folding>
         </state>
       </provider>
