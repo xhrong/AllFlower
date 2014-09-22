@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="main_next_btn_width">100dp</dimen>
+    <dimen name="main_next_btn_height">100dp</dimen>
+
+    <dimen name="gallery_download_btn_width">100dp</dimen>
+    <dimen name="gallery_download_btn_height">100dp</dimen>
+</resources>
