@@ -4,8 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
-import com.iflytek.iFramework.http.AsyncHttpClient;
-import com.iflytek.iFramework.http.BinaryHttpResponseHandler;
+import com.iflytek.iFramework.http.asynhttp.AsyncHttpClient;
+import com.iflytek.iFramework.http.asynhttp.BinaryHttpResponseHandler;
 import org.apache.http.Header;
 
 import java.io.File;

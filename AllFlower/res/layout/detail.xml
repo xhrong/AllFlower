@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+        >
+    <TextView
+            android:id="@+id/tvFlowerTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Flower Title"
+            />
+    <ImageView
+            android:id="@+id/ivFlowerImage"
+            android:src="@drawable/noimage"
+            android:layout_below="@id/tvFlowerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <TextView
+            android:id="@+id/tvFlowerDescription"
+            android:layout_below="@id/ivFlowerImage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Flower Description"
+            />
+
+    <TextView
+            android:id="@+id/tvFlowerStory"
+            android:layout_below="@id/tvFlowerDescription"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Flower Story"
+            />
+    <LinearLayout
+            android:layout_alignParentBottom="true"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        <ImageView
+                android:id="@+id/ivNextFlower"
+                android:src="@drawable/next"
+                android:layout_width="@dimen/main_next_btn_width"
+                android:layout_height="@dimen/main_next_btn_height"/>
+    </LinearLayout>
+
+</RelativeLayout>
+

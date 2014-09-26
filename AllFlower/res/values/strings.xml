@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AllFlower</string>
+    <string name="app_name">百花图谱</string>
+    <string name="default_flower_name">花</string>
+
+    <string name="btn_random_text">随便看看</string>
 </resources>

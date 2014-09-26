@@ -5,4 +5,7 @@
 
     <dimen name="gallery_download_btn_width">100dp</dimen>
     <dimen name="gallery_download_btn_height">100dp</dimen>
+
+    <dimen name="slidingmenu_offset">60dp</dimen>
+    <dimen name="shadow_width">15dp</dimen>
 </resources>

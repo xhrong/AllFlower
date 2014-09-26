@@ -1,47 +1,63 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-        >
-    <TextView
-            android:id="@+id/tvFlowerTitle"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Flower Title"
-            />
-    <ImageView
-            android:id="@+id/ivFlowerImage"
-            android:layout_below="@id/tvFlowerTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                tools:context=".MainActivity">
 
-    <TextView
-            android:id="@+id/tvFlowerDescription"
-            android:layout_below="@id/ivFlowerImage"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Flower Description"
-            />
-
-    <TextView
-            android:id="@+id/tvFlowerStory"
-            android:layout_below="@id/tvFlowerDescription"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Flower Story"
-            />
-    <LinearLayout
-            android:layout_alignParentBottom="true"
-            android:gravity="center|center_horizontal|center_vertical"
-            android:layout_width="fill_parent"
+    <include android:id="@+id/appTitleLayout" layout="@layout/app_title"/>
+    <RelativeLayout
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:id="@+id/mainBtnLayout"
+            android:layout_below="@id/appTitleLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <ImageView
-                android:id="@+id/ivNextFlower"
-                android:src="@drawable/next"
-                android:layout_width="@dimen/main_next_btn_width"
-                android:layout_height="@dimen/main_next_btn_height"/>
-    </LinearLayout>
+        <Button
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_border"
+                android:text="更多"
+                android:id="@+id/btnMore"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:minWidth="20dp"
+                android:layout_marginRight="10dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text=""
+                android:textColor="@color/blue"
+                android:id="@+id/tvCurrFlowerName"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                />
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="当前花名是："
+                android:textColor="@color/blue"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/tvCurrFlowerName"
+                />
+    </RelativeLayout>
+
+    <com.iflytek.iFramework.ui.pulltorefresh.PullToRefreshGridView
+            android:id="@+id/ptrgvList"
+            xmlns:ptr="http://schemas.android.com/apk/res-auto"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            android:layout_below="@id/mainBtnLayout"
+            android:numColumns="3"
+            android:verticalSpacing="1dp"
+            android:horizontalSpacing="1dp"
+            android:stretchMode="columnWidth"
+            android:columnWidth="20dp"
+            ptr:ptrMode="pullUpFromBottom"
+            ptr:ptrDrawable="@drawable/updating"
+            />
+
 
 </RelativeLayout>
-

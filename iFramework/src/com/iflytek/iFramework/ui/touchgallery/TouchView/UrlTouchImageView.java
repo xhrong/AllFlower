@@ -117,6 +117,7 @@ public class UrlTouchImageView extends RelativeLayout {
             try {
                 URL aURL = new URL(url);
                 URLConnection conn = aURL.openConnection();
+                conn.setConnectTimeout(5000);
                 conn.connect();
                 InputStream is = conn.getInputStream();
                 int totalLen = conn.getContentLength();

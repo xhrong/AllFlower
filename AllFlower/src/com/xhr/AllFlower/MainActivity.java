@@ -1,134 +1,329 @@
 package com.xhr.AllFlower;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-import com.iflytek.iFramework.logger.Logger;
-import com.iflytek.iFramework.ui.universalimageloader.core.DisplayImageOptions;
+import android.view.ViewGroup;
+import android.widget.*;
+import com.iflytek.iFramework.http.synhttp.SynHttpClient;
+import com.iflytek.iFramework.ui.pulltorefresh.PullToRefreshBase;
+import com.iflytek.iFramework.ui.pulltorefresh.PullToRefreshGridView;
+import com.iflytek.iFramework.ui.slidingmenu.SlidingMenu;
 import com.iflytek.iFramework.ui.universalimageloader.core.ImageLoader;
 import com.iflytek.iFramework.ui.universalimageloader.core.assist.FailReason;
-import com.iflytek.iFramework.ui.universalimageloader.core.assist.ImageSize;
-import com.iflytek.iFramework.ui.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.xhr.AllFlower.model.FlowerInfo;
+import com.iflytek.iFramework.ui.universalimageloader.core.listener.ImageLoadingListener;
+import com.iflytek.iFramework.utils.StringUtils;
+import com.xhr.AllFlower.model.ImageInfo;
+import com.xhr.AllFlower.utils.ScreenUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.Serializable;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Created by xhrong on 2014/9/23.
+ */
 public class MainActivity extends Activity {
 
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
-    private List<FlowerInfo> flowerInfoList = new ArrayList<FlowerInfo>();
+    private PullToRefreshGridView pullToRefreshGridView;
+    private GridView gridView;
+    private SearchView svSearch;
 
-    private DisplayImageOptions options = new DisplayImageOptions.Builder()
-            .showImageOnFail(R.drawable.noimage)
-            .showImageForEmptyUri(R.drawable.noimage)
-            .showImageOnLoading(R.drawable.noimage)
-            .cacheInMemory(true) // default
-            .cacheOnDisk(true) // default
-            .build();
+    private ListView lvFlowerName;
+    private Button btnRandom;
+    SlidingMenu menu;
 
-    private ImageView ivFlowerImage;
-    private TextView tvFlowerDescription;
-    private TextView tvFlowerTitle;
-    private TextView tvFlowerStory;
-    private  ImageView ivNextFlower;
+    private PullToRefreshAdapter adapter;
+    private List<ImageInfo> imageList = new ArrayList<ImageInfo>();
+    private int curPage = 1;
+    private String curFlowerName;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        setCurrentFlowerName(AppConstants.DEFAULT_FLOWER_NAME);
+        initSlidingMenu();
+        svSearch = (SearchView) findViewById(R.id.svSearch);
+        svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                imageList.clear();
+                if (StringUtils.isEmpty(s)) {
+                    setCurrentFlowerName(AppConstants.DEFAULT_FLOWER_NAME);
+                } else
+                    setCurrentFlowerName(s);
+                new GetDataTask().execute();
+                return false;
+            }
 
-        initView();
-        initData();
-        showFlower();
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
 
-        ivNextFlower.setOnClickListener(new View.OnClickListener() {
+        pullToRefreshGridView = (PullToRefreshGridView) findViewById(R.id.ptrgvList);
+        gridView = pullToRefreshGridView.getRefreshableView();
+        pullToRefreshGridView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<GridView>() {
+
+            @Override
+            public void onPullDownToRefresh(PullToRefreshBase<GridView> refreshView) {
+                Toast.makeText(MainActivity.this, "Pull Down!", Toast.LENGTH_SHORT).show();
+                new GetDataTask().execute();
+            }
+
+            @Override
+            public void onPullUpToRefresh(PullToRefreshBase<GridView> refreshView) {
+                Toast.makeText(MainActivity.this, "Pull Up!", Toast.LENGTH_SHORT).show();
+                new GetDataTask().execute();
+
+            }
+        });
+
+
+        TextView tv = new TextView(this);
+        tv.setGravity(Gravity.CENTER);
+        pullToRefreshGridView.setEmptyView(tv);
+        adapter = new PullToRefreshAdapter(imageList, this);
+        gridView.setAdapter(adapter);
+        new GetDataTask().execute();
+    }
+
+    private void initSlidingMenu() {
+        int screenWidth = ScreenUtil.getScreenWidth(this);
+        // configure the SlidingMenu
+        menu = new SlidingMenu(this);
+        menu.setMode(SlidingMenu.LEFT);
+        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        menu.setShadowWidthRes(R.dimen.shadow_width);
+        menu.setShadowDrawable(R.drawable.slidingmenu_shadow);
+        menu.setBehindWidth(screenWidth / 3);
+        menu.setFadeDegree(0.35f);
+        menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        menu.setMenu(R.layout.slidingmenu);
+
+        lvFlowerName = (ListView) findViewById(R.id.lvFlowerName);
+        ArrayAdapter<String> menuAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1);
+        menuAdapter.addAll(AppConstants.FLOWER_NAMES);
+        lvFlowerName.setAdapter(menuAdapter);
+
+        lvFlowerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                imageList.clear();
+                setCurrentFlowerName(AppConstants.FLOWER_NAMES[i]);
+                new GetDataTask().execute();
+            }
+        });
+
+        btnRandom = (Button) findViewById(R.id.btnRandom);
+        btnRandom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showFlower();
+                Random random = new Random();
+                setCurrentFlowerName(AppConstants.FLOWER_NAMES[random.nextInt(AppConstants.FLOWER_NAMES.length)]);
+                imageList.clear();
+                new GetDataTask().execute();
+            }
+        });
+
+        ((Button) findViewById(R.id.btnMore)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                menu.showMenu();
             }
         });
     }
 
-    private FlowerInfo getFlower(){
-        Random random=new Random();
-        return flowerInfoList.get(random.nextInt(2));
+    private void setCurrentFlowerName(String flowerName) {
+        this.curFlowerName = flowerName;
+        ((TextView) findViewById(R.id.tvCurrFlowerName)).setText(curFlowerName);
     }
 
-    private void showFlower(){
-        FlowerInfo flowerInfo=getFlower();
-        ImageSize targetSize = new ImageSize(100, 80);
-        imageLoader.loadImage(flowerInfo.getThumbnailUrl(), targetSize, options, new SimpleImageLoadingListener() {
-            @Override
-            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                ivFlowerImage.setImageBitmap(loadedImage);
-                ivFlowerImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
-                        startActivity(intent);
+    public class PullToRefreshAdapter extends BaseAdapter {
+
+        List<ImageInfo> list;
+        Context context;
+        private Drawable drawable;
+
+        public PullToRefreshAdapter(List<ImageInfo> list, Context context) {
+            this.list = list;
+            this.context = context;
+            drawable = context.getResources().getDrawable(R.drawable.noimage);
+        }
+
+
+        @Override
+        public int getCount() {
+            return list != null ? list.size() : 0;
+        }
+
+        @Override
+        public Object getItem(int arg0) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int arg0) {
+            return 0;
+        }
+
+        @Override
+        public View getView(final int position, View view, ViewGroup group) {
+            final Holder holder;
+            if (view == null) {
+                holder = new Holder();
+                LayoutInflater inflater = LayoutInflater.from(context);
+                view = inflater.inflate(R.layout.image_item, null);
+                holder.ivIcon = (ImageView) view.findViewById(R.id.row_icon);
+                holder.pbLoad = (ProgressBar) view.findViewById(R.id.pb_load);
+                view.setTag(holder);
+            } else {
+                holder = (Holder) view.getTag();
+            }
+
+            String url = list.get(position).getThumbUrl();
+          //  Object iconData = holder.ivIcon.getTag();
+         //   if (iconData == null || StringUtils.isEmpty(iconData.toString()) || !iconData.toString().equals(url)) {
+                holder.ivIcon.setTag(position);
+                imageLoader.displayImage(url, holder.ivIcon, AppConstants.IMAGE_LOADER_DISPLAY_OPTIONS,
+                        new ImageLoadingListener() {
+                            @Override
+                            public void onLoadingStarted(String imageUri, View view) {
+                                holder.ivIcon.setImageDrawable(drawable);
+                                holder.pbLoad.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onLoadingFailed(String imageUri, View view,
+                                                        FailReason failReason) {
+                                String message = null;
+                                switch (failReason.getType()) {
+                                    case IO_ERROR:
+                                        message = "Input/Output error";
+                                        break;
+                                    case DECODING_ERROR:
+                                        message = "can not be decoding";
+                                        break;
+                                    case NETWORK_DENIED:
+                                        message = "Downloads are denied";
+                                        break;
+                                    case OUT_OF_MEMORY:
+                                        message = "内存不足";
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                                                .show();
+                                        break;
+                                    case UNKNOWN:
+                                        message = "Unknown error";
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                                                .show();
+                                        break;
+                                }
+                                holder.pbLoad.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onLoadingComplete(String imageUri, View view,
+                                                          Bitmap loadedImage) {
+                                holder.pbLoad.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onLoadingCancelled(String paramString,
+                                                           View paramView) {
+                            }
+                        }
+                );
+         //   }
+
+
+            holder.ivIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("imagelist", (Serializable) imageList);
+                    bundle.putString("flowername", curFlowerName);
+                    int pos = 0;
+                    try {
+                        pos = Integer.parseInt(view.getTag().toString());
+                    } catch (Exception e) {
+
                     }
-                });
-            }
+                    Log.i("POS", Integer.toString(pos));
+                    bundle.putInt("pos", pos);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
 
-            @Override
-            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+            return view;
+        }
 
-                Logger.i("sss", "ddd");
-            }
-        });
-        tvFlowerTitle.setText(flowerInfo.getTitle());
-        tvFlowerStory.setText(flowerInfo.getStory());
-        tvFlowerDescription.setText(flowerInfo.getDescription());
+
     }
 
-    private void initView(){
-        ivFlowerImage = (ImageView) findViewById(R.id.ivFlowerImage);
-        tvFlowerStory=(TextView) findViewById(R.id.tvFlowerStory);
-        tvFlowerTitle=(TextView) findViewById(R.id.tvFlowerTitle);
-        tvFlowerDescription=(TextView) findViewById(R.id.tvFlowerDescription);
-        ivNextFlower=(ImageView)findViewById(R.id.ivNextFlower);
+    class Holder {
+        public ImageView ivIcon;
+        public ProgressBar pbLoad;
     }
 
-    private void initData() {
-        String[] urls = {
-                "http://b.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26%3Bt%3Dgif/sign=8830b492d11373f0e13267cdc566209e/b3b7d0a20cf431ad929c6fd04b36acaf2fdd9888.jpg",
-                "http://b.hiphotos.baidu.com/baike/c0%3Dbaike150%2C5%2C5%2C150%2C50%3Bt%3Dgif/sign=7f5381b8fffaaf5190ee89eded3dff8b/fd039245d688d43f36dcb86c7f1ed21b0ef43b32.jpg",
-        };
-        String[] descriptions={
-                "合欢花（拉丁学名：Albizzia julibrissin Durazz.）是豆科，合欢属落叶乔木，喜温暖湿润和阳光充足环境，气微香，味淡。\n" +
-                        "产中国东北至华南及西南部各省区。生于山坡或栽培。非洲、中亚至东亚均有分布；北美亦有栽培。\n" +
-                        "合欢花花丝粉红色，荚果偏，是城市行道树、观赏树。心材黄灰褐色，边材黄白色，耐久，多用于制家具；嫩叶可食，老叶可以洗衣服；树皮供药用，有驱虫之效。它还有宁神作用，主要是治郁结胸闷、失眠健忘、滋阴补阳、眼疾、神经衰弱等功效",
-                "彼岸花的日文别名叫做\"曼珠沙华\"，是来自于<<法华经>>中梵语\"摩诃曼珠沙华\"的音译。原意为天上之花，大红花，是天降吉兆四华（曼珠沙华、摩诃曼殊沙华、曼陀罗华、摩诃曼陀罗华）之一，典称见此花者，恶自去除。"
-        };
-        String[] titles={
-                "合欢花",
-                "彼岸花"
-        };
-        String[] stories={
-                "相传虞舜南巡仓梧而死，其妃娥皇、女英遍寻湘江，终未寻见。二妃终日恸哭，泪尽滴血，血尽而死，逐为其神。后来，人们发现她们的精灵与虞舜的精灵“合二为一”，变成了合欢树。合欢树叶，昼开夜合，相亲相爱。自此，人们常以合欢表示忠贞不渝的爱情。[6] ",
-                "彼岸花，花开一千年，花落一千年，花叶生生相错，世世永不相见。彼岸花开开彼岸，奈何桥前可奈何？走向死亡国度的人，就是踏着这凄美的花朵通向幽冥之狱。\n" +
-                        "　　彼岸花学名“红花石蒜”，是单子叶植物纲百合目石蒜科石蒜属植物，英文学名“Lycoris radiata”，“Lycoris”一词是来自与西腊神话中海之女神的名字，而“radita”则表示辐射状的意思，用来形容花的外型。除红色外还有白色、黄色等品种。\n" +
-                        "　　“彼岸花，开彼岸，只见花，不见叶”。\n" +
-                        "　　曼珠沙华这个名字出自梵语「摩诃曼珠沙华」，梵语意为开在天界的大红花。天降吉兆，是天界四华之一。佛典中也说曼陀罗华是天上开的花，白色而柔软，见此花者，恶自去除。\n" +
-                        "　　相传此花只开于黄泉，是黄泉路上唯一的风景。\n" +
-                        "　　传说彼岸花是恶魔的温柔。自愿投入地狱的花朵，被众魔遣回，但仍徘徊于黄泉路上，众魔不忍，遂同意让她开在此路上，给离开人界的亡魂们一个指引与安慰。（此处与下文神话传说中的地藏菩萨段落并无冲突，仔细阅读可知，或见编者的话，请勿删去。）认为是生长在忘川河边的接引之花，是冥界唯一的花。在那儿大批大批的开着这花，远远看上去就像是血所铺成的地毯，又因其红的似火而被喻为”火照之路”。也是这长长黄泉路上唯一的风景与色彩，人们就踏着这花的指引通向幽冥之狱。因此又意为死亡之花。\n" +
-                        "　　相传花香有魔力，能唤起死者生前的记忆。佛家语，荼蘼是花季最后盛开的花，开到荼蘼花事了，只剩下开在遗忘前生的彼岸的花。佛经记载有“彼岸花，开一千年，落一千年，花叶永不相见。情不为因果，缘注定生死。”"
-        };
-        for (int i = 0; i < 2; i++) {
-            FlowerInfo flowerInfo = new FlowerInfo();
-            flowerInfo.setDescription(descriptions[i]);
-            flowerInfo.setStory(stories[i]);
-            flowerInfo.setTitle(titles[i]);
-            flowerInfo.setThumbnailUrl(urls[i]);
-            flowerInfoList.add(flowerInfo);
+    private class GetDataTask extends AsyncTask<Void, Void, List<ImageInfo>> {
+
+        @Override
+        protected List<ImageInfo> doInBackground(Void... params) {
+            List<ImageInfo> result = new ArrayList<ImageInfo>();
+            try {
+                String url = AppConstants.GET_FLOWER_BY_NAME_URL
+                        .replace("{flowername}", URLEncoder.encode(curFlowerName, "utf-8"))
+                        .replace("{page}", Integer.toString(curPage));
+                String data = SynHttpClient.sendGet(url, null);
+                if (StringUtils.isEmpty(data) || "null".equals(data)) {
+                    return result;
+                }
+                JSONObject jsonImgs = new JSONObject(data);
+                JSONArray arrData = jsonImgs.getJSONArray("data");
+                int length = arrData.length();
+                for (int i = 0; i < length; i++) {
+                    ImageInfo flowerInfo = new ImageInfo();
+                    JSONObject oj = arrData.getJSONObject(i);
+                    flowerInfo.setThumbUrl(oj.getString("thumbURL"));
+                    flowerInfo.setUrl(oj.getString("objURL"));
+                    flowerInfo.setTitle(oj.getString("fromPageTitle"));
+                    result.add(flowerInfo);
+                }
+            } catch (JSONException je) {
+
+            } catch (Exception e) {
+
+            } finally {
+                return result;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<ImageInfo> result) {
+            imageList.addAll(result);
+            adapter.notifyDataSetChanged();
+            curPage++;
+            pullToRefreshGridView.onRefreshComplete();
+            super.onPostExecute(result);
         }
     }
 }
-

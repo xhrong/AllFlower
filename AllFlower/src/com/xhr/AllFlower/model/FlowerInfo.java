@@ -1,9 +1,11 @@
 package com.xhr.AllFlower.model;
 
+import java.io.Serializable;
+
 /**
  * Created by xhrong on 2014/9/22.
  */
-public class FlowerInfo {
+public class FlowerInfo implements Serializable{
 
     private String title;
     private String thumbnailUrl;
