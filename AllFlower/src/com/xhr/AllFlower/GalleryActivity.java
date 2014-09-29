@@ -2,19 +2,25 @@ package com.xhr.AllFlower;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.iflytek.iFramework.http.asynhttp.AsyncHttpClient;
+import com.iflytek.iFramework.http.asynhttp.AsyncHttpResponseHandler;
 import com.iflytek.iFramework.ui.touchgallery.GalleryWidget.BasePagerAdapter;
 import com.iflytek.iFramework.ui.touchgallery.GalleryWidget.GalleryViewPager;
 import com.iflytek.iFramework.ui.touchgallery.GalleryWidget.UrlPagerAdapter;
 import com.xhr.AllFlower.model.ImageInfo;
 import com.xhr.AllFlower.utils.ImageDownloader;
+import org.apache.http.Header;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by xhrong on 2014/9/18.
@@ -44,7 +50,7 @@ public class GalleryActivity extends Activity {
             @Override
             public void onItemChange(int currentPosition) {
                 currPos = currentPosition;
-                tvImageDescription.setText(imageInfoList.get(currPos).getDescription());
+           //     tvImageDescription.setText(imageInfoList.get(currPos).getDescription());
             }
         });
         mViewPager = (GalleryViewPager) findViewById(R.id.gvImageViewer);
@@ -65,8 +71,8 @@ public class GalleryActivity extends Activity {
                 ImageDownloader.getInstance().downloadFile(imageInfoList.get(currPos).getUrl());
             }
         });
-        tvImageDescription = (TextView) findViewById(R.id.tvImageDescription);
-        tvImageDescription.setText(imageInfoList.get(currPos).getDescription());
+      //  tvImageDescription = (TextView) findViewById(R.id.tvImageDescription);
+    //    tvImageDescription.setText(imageInfoList.get(currPos).getDescription());
     }
 
 
@@ -122,6 +128,46 @@ public class GalleryActivity extends Activity {
             tvImageDescription.startAnimation(animation);
 
         }
+
+    }
+    private  String getData(String sourceStr,String pattern){
+        //  String filetext = "张小名=25分|李小花=43分|王力=100分|";
+        Pattern p = Pattern.compile(pattern);//正则表达式，取=和|之间的字符串，不包括=和|
+        Matcher m = p.matcher(sourceStr);
+        if(m.find()){
+            return m.group(1);
+        }else{
+            return "";
+        }
+    }
+    private void shiTu(String imageURL) {
+        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+
+        try {
+            String apiUrl = "http://stu.baidu.com/i?objurl="+imageURL+"&filename=&rt=0&rn=10&ftn=searchstu&ct=1&stt=1&tn=faceresult";
+
+            asyncHttpClient.get(apiUrl, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers,
+                                      byte[] responseBody) {
+                    String data=new String(responseBody);
+                    Log.i("SHITU", data);
+                    String name=getData(data,"keyword:BD.STU.escapeXSS\\(\\\"(.*)\\\"\\),keywordEnc");
+                    String baikeUrl=getData(data,"baikeURL:\\\"(.*)\\\",baikeText");
+                    String baikeText=getData(data,"baikeText:\\\"(.*)\\\",baikeTitle");
+                    Log.i("SHITU", name);
+                    Log.i("SHITU", baikeUrl);
+                    Log.i("SHITU", baikeText);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers,
+                                      byte[] responseBody, Throwable error) {
+                }
+            });
+        } catch (Exception e) {
+        }
+
 
     }
 }

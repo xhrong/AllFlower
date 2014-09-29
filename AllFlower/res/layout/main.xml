@@ -5,7 +5,7 @@
                 android:background="@color/white"
                 tools:context=".MainActivity">
 
-    <include android:id="@+id/appTitleLayout" layout="@layout/app_title"/>
+    <include android:id="@+id/appTitleLayout" layout="@layout/app_title_main"/>
     <RelativeLayout
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"

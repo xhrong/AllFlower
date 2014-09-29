@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
     <com.iflytek.iFramework.ui.touchgallery.GalleryWidget.GalleryViewPager
             android:id="@+id/gvImageViewer"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"/>
+    <include android:id="@+id/galleryTopLayout"
+             layout="@layout/top_gallery"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/tvImageDescription"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            android:visibility="invisible"
-            android:layout_marginTop="169dp"
-            android:gravity="center|center_horizontal"
-            />
-    <ImageView
-            android:layout_width="@dimen/gallery_download_btn_width"
-            android:layout_height="@dimen/gallery_download_btn_height"
-            android:src="@drawable/download"
-            android:id="@+id/ivDownload"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            />
+    <RelativeLayout android:layout_width="match_parent"
+                  android:layout_centerHorizontal="true"
+                  android:layout_alignParentBottom="true"
+                  android:layout_height="wrap_content">
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_centerHorizontal="true"
+                      android:layout_alignParentBottom="true"
+                      android:layout_height="wrap_content">
+            <include android:id="@+id/galleryFooterLayout"
+                     android:layout_centerInParent="true"
+                     layout="@layout/footer_gallery"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+
 </RelativeLayout>

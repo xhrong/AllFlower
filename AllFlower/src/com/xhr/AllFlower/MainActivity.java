@@ -199,63 +199,64 @@ public class MainActivity extends Activity {
             }
 
             String url = list.get(position).getThumbUrl();
-          //  Object iconData = holder.ivIcon.getTag();
-         //   if (iconData == null || StringUtils.isEmpty(iconData.toString()) || !iconData.toString().equals(url)) {
-                holder.ivIcon.setTag(position);
-                imageLoader.displayImage(url, holder.ivIcon, AppConstants.IMAGE_LOADER_DISPLAY_OPTIONS,
-                        new ImageLoadingListener() {
-                            @Override
-                            public void onLoadingStarted(String imageUri, View view) {
-                                holder.ivIcon.setImageDrawable(drawable);
-                                holder.pbLoad.setVisibility(View.VISIBLE);
-                            }
-
-                            @Override
-                            public void onLoadingFailed(String imageUri, View view,
-                                                        FailReason failReason) {
-                                String message = null;
-                                switch (failReason.getType()) {
-                                    case IO_ERROR:
-                                        message = "Input/Output error";
-                                        break;
-                                    case DECODING_ERROR:
-                                        message = "can not be decoding";
-                                        break;
-                                    case NETWORK_DENIED:
-                                        message = "Downloads are denied";
-                                        break;
-                                    case OUT_OF_MEMORY:
-                                        message = "内存不足";
-                                        Toast.makeText(context, message, Toast.LENGTH_SHORT)
-                                                .show();
-                                        break;
-                                    case UNKNOWN:
-                                        message = "Unknown error";
-                                        Toast.makeText(context, message, Toast.LENGTH_SHORT)
-                                                .show();
-                                        break;
-                                }
-                                holder.pbLoad.setVisibility(View.GONE);
-                            }
-
-                            @Override
-                            public void onLoadingComplete(String imageUri, View view,
-                                                          Bitmap loadedImage) {
-                                holder.pbLoad.setVisibility(View.GONE);
-                            }
-
-                            @Override
-                            public void onLoadingCancelled(String paramString,
-                                                           View paramView) {
-                            }
+            //  Object iconData = holder.ivIcon.getTag();
+            //   if (iconData == null || StringUtils.isEmpty(iconData.toString()) || !iconData.toString().equals(url)) {
+            holder.ivIcon.setTag(position);
+            imageLoader.displayImage(url, holder.ivIcon, AppConstants.IMAGE_LOADER_DISPLAY_OPTIONS,
+                    new ImageLoadingListener() {
+                        @Override
+                        public void onLoadingStarted(String imageUri, View view) {
+                            holder.ivIcon.setImageDrawable(drawable);
+                            holder.pbLoad.setVisibility(View.VISIBLE);
                         }
-                );
-         //   }
+
+                        @Override
+                        public void onLoadingFailed(String imageUri, View view,
+                                                    FailReason failReason) {
+                            String message = null;
+                            switch (failReason.getType()) {
+                                case IO_ERROR:
+                                    message = "Input/Output error";
+                                    break;
+                                case DECODING_ERROR:
+                                    message = "can not be decoding";
+                                    break;
+                                case NETWORK_DENIED:
+                                    message = "Downloads are denied";
+                                    break;
+                                case OUT_OF_MEMORY:
+                                    message = "内存不足";
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                                            .show();
+                                    break;
+                                case UNKNOWN:
+                                    message = "Unknown error";
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                                            .show();
+                                    break;
+                            }
+                            holder.pbLoad.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onLoadingComplete(String imageUri, View view,
+                                                      Bitmap loadedImage) {
+                            holder.pbLoad.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onLoadingCancelled(String paramString,
+                                                       View paramView) {
+                        }
+                    }
+            );
+            //   }
 
 
             holder.ivIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
                     Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("imagelist", (Serializable) imageList);
@@ -277,7 +278,9 @@ public class MainActivity extends Activity {
         }
 
 
+
     }
+
 
     class Holder {
         public ImageView ivIcon;
