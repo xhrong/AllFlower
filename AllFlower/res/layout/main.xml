@@ -44,20 +44,28 @@
                 />
     </RelativeLayout>
 
-    <com.iflytek.iFramework.ui.pulltorefresh.PullToRefreshGridView
+    <!--<com.iflytek.iFramework.ui.pulltorefresh.PullToRefreshGridView-->
+            <!--android:id="@+id/ptrgvList"-->
+            <!--xmlns:ptr="http://schemas.android.com/apk/res-auto"-->
+            <!--android:layout_height="fill_parent"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_below="@id/mainBtnLayout"-->
+            <!--android:numColumns="3"-->
+            <!--android:verticalSpacing="1dp"-->
+            <!--android:horizontalSpacing="1dp"-->
+            <!--android:stretchMode="columnWidth"-->
+            <!--android:columnWidth="20dp"-->
+            <!--ptr:ptrMode="pullUpFromBottom"-->
+            <!--ptr:ptrDrawable="@drawable/updating"-->
+            <!--/>-->
+    <com.iflytek.iFramework.ui.pinterestlikeadapterview.MultiColumnListView
+            xmlns:pla="http://schemas.android.com/apk/res-auto"
             android:id="@+id/ptrgvList"
-            xmlns:ptr="http://schemas.android.com/apk/res-auto"
-            android:layout_height="fill_parent"
-            android:layout_width="fill_parent"
             android:layout_below="@id/mainBtnLayout"
-            android:numColumns="3"
-            android:verticalSpacing="1dp"
-            android:horizontalSpacing="1dp"
-            android:stretchMode="columnWidth"
-            android:columnWidth="20dp"
-            ptr:ptrMode="pullUpFromBottom"
-            ptr:ptrDrawable="@drawable/updating"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            pla:plaColumnNumber="3"
+            pla:plaLandscapeColumnNumber="3"
             />
-
 
 </RelativeLayout>

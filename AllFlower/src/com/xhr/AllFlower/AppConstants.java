@@ -22,6 +22,6 @@ public class AppConstants {
     public static final String DEFAULT_FLOWER_NAME="花";
 
     public static final String GET_FLOWER_BY_NAME_URL =
-          "http://image.baidu.com/i?tn=baiduimagejson&ie=utf-8&ic=0&rn=21&pn={page}&word={flowername}&width=800&height=600";
+          "http://image.baidu.com/i?tn=baiduimagejson&ie=utf-8&ic=0&rn=21&pn={page}&word={flowername}";
           //  "http://192.168.62.8:8080/allflower/api/flower/get_flower_by_name/flowername/{flowername}/page/{page}";
 }

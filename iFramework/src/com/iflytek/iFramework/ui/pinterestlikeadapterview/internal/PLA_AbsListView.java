@@ -463,7 +463,7 @@ ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnTouchModeChangeListe
 		initAbsListView();
 
 		TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.AbsListView, defStyle, 0);
+				R.styleable.AbsListView, defStyle, 0);
 
 		Drawable d = a.getDrawable(R.styleable.AbsListView_listSelector);
 		if (d != null) {

@@ -14,9 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.iflytek.iFramework.http.synhttp.SynHttpClient;
-import com.iflytek.iFramework.ui.pulltorefresh.PullToRefreshBase;
-import com.iflytek.iFramework.ui.pulltorefresh.PullToRefreshGridView;
+import com.iflytek.iFramework.ui.pinterestlikeadapterview.MultiColumnListView;
 import com.iflytek.iFramework.ui.slidingmenu.SlidingMenu;
+import com.iflytek.iFramework.ui.tagcloud.Tag;
+import com.iflytek.iFramework.ui.tagcloud.TagCloudView;
 import com.iflytek.iFramework.ui.universalimageloader.core.ImageLoader;
 import com.iflytek.iFramework.ui.universalimageloader.core.assist.FailReason;
 import com.iflytek.iFramework.ui.universalimageloader.core.listener.ImageLoadingListener;
@@ -40,13 +41,15 @@ public class MainActivity extends Activity {
 
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
-    private PullToRefreshGridView pullToRefreshGridView;
-    private GridView gridView;
+ //   private PullToRefreshGridView pullToRefreshGridView;
+    private MultiColumnListView multiColumnListView;
+ //   private GridView gridView;
     private SearchView svSearch;
 
     private ListView lvFlowerName;
     private Button btnRandom;
     SlidingMenu menu;
+    FrameLayout tagLayout;
 
     private PullToRefreshAdapter adapter;
     private List<ImageInfo> imageList = new ArrayList<ImageInfo>();
@@ -68,6 +71,7 @@ public class MainActivity extends Activity {
                     setCurrentFlowerName(AppConstants.DEFAULT_FLOWER_NAME);
                 } else
                     setCurrentFlowerName(s);
+                curPage=1;
                 new GetDataTask().execute();
                 return false;
             }
@@ -78,30 +82,26 @@ public class MainActivity extends Activity {
             }
         });
 
-        pullToRefreshGridView = (PullToRefreshGridView) findViewById(R.id.ptrgvList);
-        gridView = pullToRefreshGridView.getRefreshableView();
-        pullToRefreshGridView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<GridView>() {
 
+        multiColumnListView=(MultiColumnListView)findViewById(R.id.ptrgvList);
+
+
+
+        multiColumnListView.setOnLoadMoreListener(new MultiColumnListView.OnLoadMoreListener() {
             @Override
-            public void onPullDownToRefresh(PullToRefreshBase<GridView> refreshView) {
-                Toast.makeText(MainActivity.this, "Pull Down!", Toast.LENGTH_SHORT).show();
+            public void onLoadMore() {
                 new GetDataTask().execute();
-            }
-
-            @Override
-            public void onPullUpToRefresh(PullToRefreshBase<GridView> refreshView) {
-                Toast.makeText(MainActivity.this, "Pull Up!", Toast.LENGTH_SHORT).show();
-                new GetDataTask().execute();
-
             }
         });
 
 
+
         TextView tv = new TextView(this);
         tv.setGravity(Gravity.CENTER);
-        pullToRefreshGridView.setEmptyView(tv);
+    //    pullToRefreshGridView.setEmptyView(tv);
         adapter = new PullToRefreshAdapter(imageList, this);
-        gridView.setAdapter(adapter);
+      //  gridView.setAdapter(adapter);
+        multiColumnListView.setAdapter(adapter);
         new GetDataTask().execute();
     }
 
@@ -117,6 +117,31 @@ public class MainActivity extends Activity {
         menu.setFadeDegree(0.35f);
         menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         menu.setMenu(R.layout.slidingmenu);
+        menu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+            @Override
+            public void onOpen() {
+                tagLayout=(FrameLayout)findViewById(R.id.tagLayout);
+                if(tagLayout.getChildCount()>0)return;
+                List<Tag> myTagList= createTags();
+                mTagCloudView = new TagCloudView(MainActivity.this,    tagLayout.getWidth(),tagLayout.getHeight(), myTagList,new TagCloudView.OnTagClickListener() {
+                    @Override
+                    public void onTagClick(TagCloudView tagCloudView,View view, int position) {
+                        String data=tagCloudView.getTagCloud().get(position).getText();
+                        imageList.clear();
+                        if (StringUtils.isEmpty(data)) {
+                            setCurrentFlowerName(AppConstants.DEFAULT_FLOWER_NAME);
+                        } else
+                            setCurrentFlowerName(data);
+                        curPage=1;
+                        new GetDataTask().execute();
+                        Toast.makeText(MainActivity.this,data,Toast.LENGTH_LONG).show();
+                    }
+                }); //通过当前上下文
+                tagLayout.addView(mTagCloudView);
+                mTagCloudView.requestFocus();
+                mTagCloudView.setFocusableInTouchMode(true);
+            }
+        });
 
         lvFlowerName = (ListView) findViewById(R.id.lvFlowerName);
         ArrayAdapter<String> menuAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1);
@@ -128,6 +153,7 @@ public class MainActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 imageList.clear();
                 setCurrentFlowerName(AppConstants.FLOWER_NAMES[i]);
+                curPage=1;
                 new GetDataTask().execute();
             }
         });
@@ -139,6 +165,7 @@ public class MainActivity extends Activity {
                 Random random = new Random();
                 setCurrentFlowerName(AppConstants.FLOWER_NAMES[random.nextInt(AppConstants.FLOWER_NAMES.length)]);
                 imageList.clear();
+                curPage=1;
                 new GetDataTask().execute();
             }
         });
@@ -186,6 +213,7 @@ public class MainActivity extends Activity {
 
         @Override
         public View getView(final int position, View view, ViewGroup group) {
+
             final Holder holder;
             if (view == null) {
                 holder = new Holder();
@@ -198,7 +226,7 @@ public class MainActivity extends Activity {
                 holder = (Holder) view.getTag();
             }
 
-            String url = list.get(position).getThumbUrl();
+            String url = list.get(position).getUrl();
             //  Object iconData = holder.ivIcon.getTag();
             //   if (iconData == null || StringUtils.isEmpty(iconData.toString()) || !iconData.toString().equals(url)) {
             holder.ivIcon.setTag(position);
@@ -241,6 +269,7 @@ public class MainActivity extends Activity {
                         @Override
                         public void onLoadingComplete(String imageUri, View view,
                                                       Bitmap loadedImage) {
+
                             holder.pbLoad.setVisibility(View.GONE);
                         }
 
@@ -292,6 +321,11 @@ public class MainActivity extends Activity {
         @Override
         protected List<ImageInfo> doInBackground(Void... params) {
             List<ImageInfo> result = new ArrayList<ImageInfo>();
+//            ImageInfo ii=new ImageInfo();
+//            ii.setUrl("http://s11.sinaimg.cn/middle/717508c3ga3335894a24a&690");
+//            ii.setTitle("eee");
+//            ii.setThumbUrl("http://s11.sinaimg.cn/middle/717508c3ga3335894a24a&690");
+//            result.add(ii);
             try {
                 String url = AppConstants.GET_FLOWER_BY_NAME_URL
                         .replace("{flowername}", URLEncoder.encode(curFlowerName, "utf-8"))
@@ -325,8 +359,32 @@ public class MainActivity extends Activity {
             imageList.addAll(result);
             adapter.notifyDataSetChanged();
             curPage++;
-            pullToRefreshGridView.onRefreshComplete();
+          //  pullToRefreshGridView.onRefreshComplete();
+            multiColumnListView.onLoadMoreComplete();
             super.onPostExecute(result);
         }
     }
+
+
+
+    private List<Tag> createTags(){
+
+        List<Tag> tempList = new ArrayList<Tag>();
+
+        tempList.add(new Tag("荷花", 7));  //1,4,7,... 假定受欢迎的值
+        tempList.add(new Tag("菊花", 3));
+        tempList.add(new Tag("百合", 4));
+        tempList.add(new Tag("秋海棠", 5));
+        tempList.add(new Tag("杏花", 5));
+        tempList.add(new Tag("梅花", 7));
+        tempList.add(new Tag("金银花", 3));
+        tempList.add(new Tag("紫藤花", 5));
+        tempList.add(new Tag("油菜花", 3));
+        tempList.add(new Tag("梨花", 8));
+        tempList.add(new Tag("樱花", 5));
+        tempList.add(new Tag("茶花", 1));
+        return tempList;
+    }
+
+    private TagCloudView mTagCloudView;
 }

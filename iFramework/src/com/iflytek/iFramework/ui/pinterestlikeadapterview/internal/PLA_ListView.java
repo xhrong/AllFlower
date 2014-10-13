@@ -16,6 +16,8 @@
 
 package com.iflytek.iFramework.ui.pinterestlikeadapterview.internal;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -33,9 +35,8 @@ import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ListAdapter;
+import android.widget.WrapperListAdapter;
 import com.iflytek.iFramework.R;
-
-import java.util.ArrayList;
 
 
 
@@ -132,7 +133,7 @@ public class PLA_ListView extends PLA_AbsListView {
 		super(context, attrs, defStyle);
 
 		TypedArray a = context.obtainStyledAttributes(attrs,
-				R.styleable.ListView, defStyle, 0);
+                R.styleable.ListView, defStyle, 0);
 
 		//        final Drawable d = a.getDrawable(android.R.drawable.divider_horizontal_bright);
 		//        if (d != null) {

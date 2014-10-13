@@ -26,7 +26,7 @@ import android.view.View;
 
 import com.iflytek.iFramework.R;
 import com.iflytek.iFramework.ui.pinterestlikeadapterview.internal.PLA_AbsListView;
-import com.iflytek.iFramework.ui.pinterestlikeadapterview.internal.PLA_ListView;
+import  com.iflytek.iFramework.ui.pinterestlikeadapterview.internal.PLA_ListView;
 
 /**
  * @author huewu.ynag
