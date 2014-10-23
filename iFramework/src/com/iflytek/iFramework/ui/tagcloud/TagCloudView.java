@@ -148,11 +148,11 @@ public class TagCloudView extends RelativeLayout {
                     0,
                     0);
             mTextView.get(tempTag.getParamNo()).setTextSize((int) (tempTag.getTextSize() * tempTag.getScale()));
-            int mergedColor = Color.argb((int) (tempTag.getAlpha() * 255),
-                    (int) (tempTag.getColorR() * 255),
-                    (int) (tempTag.getColorG() * 255),
-                    (int) (tempTag.getColorB() * 255));
-            mTextView.get(tempTag.getParamNo()).setTextColor(mergedColor);
+//            int mergedColor = Color.argb((int) (tempTag.getAlpha() * 255),
+//                    (int) (tempTag.getColorR() * 255),
+//                    (int) (tempTag.getColorG() * 255),
+//                    (int) (tempTag.getColorB() * 255));
+         //   mTextView.get(tempTag.getParamNo()).setTextColor(mergedColor);
             mTextView.get(tempTag.getParamNo()).bringToFront();
         }
         return true;
@@ -189,11 +189,11 @@ public class TagCloudView extends RelativeLayout {
                             0,
                             0);
                     mTextView.get(tempTag.getParamNo()).setTextSize((int) (tempTag.getTextSize() * tempTag.getScale()));
-                    int mergedColor = Color.argb((int) (tempTag.getAlpha() * 255),
-                            (int) (tempTag.getColorR() * 255),
-                            (int) (tempTag.getColorG() * 255),
-                            (int) (tempTag.getColorB() * 255));
-                    mTextView.get(tempTag.getParamNo()).setTextColor(mergedColor);
+//                    int mergedColor = Color.argb((int) (tempTag.getAlpha() * 255),
+//                            (int) (tempTag.getColorR() * 255),
+//                            (int) (tempTag.getColorG() * 255),
+//                            (int) (tempTag.getColorB() * 255));
+//                    mTextView.get(tempTag.getParamNo()).setTextColor(mergedColor);
                     mTextView.get(tempTag.getParamNo()).bringToFront();
                 }
 

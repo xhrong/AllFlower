@@ -3,8 +3,14 @@ package com.xhr.AllFlower;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -18,20 +24,26 @@ import com.iflytek.iFramework.http.asynhttp.AsyncHttpResponseHandler;
 import com.iflytek.iFramework.ui.touchgallery.GalleryWidget.BasePagerAdapter;
 import com.iflytek.iFramework.ui.touchgallery.GalleryWidget.GalleryViewPager;
 import com.iflytek.iFramework.ui.touchgallery.GalleryWidget.UrlPagerAdapter;
+import com.tietuku.entity.main.PostImage;
+import com.tietuku.entity.token.Token;
 import com.xhr.AllFlower.model.ImageInfo;
 import com.xhr.AllFlower.utils.ImageDownloader;
 import org.apache.http.Header;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by xhrong on 2014/9/18.
  */
-public class GalleryActivity extends Activity {
+public class GalleryActivity extends Activity implements Handler.Callback{
     private GalleryViewPager mViewPager;
 
     private int currPos = 0;
@@ -41,11 +53,15 @@ public class GalleryActivity extends Activity {
 
     private ImageView ivDownload;
     private ImageButton imgBtnShiTu;
+    private ImageButton imgBtnLocalShiTu;
+
+    private  Handler handler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gallery);
+        handler=new Handler(this);
         initData();
         initView();
     }
@@ -81,6 +97,14 @@ public class GalleryActivity extends Activity {
             @Override
             public void onClick(View view) {
                 shiTu(imageInfoList.get(currPos).getUrl());
+            }
+        });
+
+        imgBtnLocalShiTu = (ImageButton) findViewById(R.id.imgBtnLocalShiTu);
+        imgBtnLocalShiTu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                letCamera();
             }
         });
     }
@@ -136,6 +160,7 @@ public class GalleryActivity extends Activity {
                 }
             });
         } catch (Exception e) {
+            Log.e("eee",e.getMessage());
         }
     }
 
@@ -152,9 +177,9 @@ public class GalleryActivity extends Activity {
         String[] results = name.split("\\*");
 
         for (int i = 0; i < results.length; i++) {
-            final String lname=results[i];
+            final String lname = results[i];
             TextView tvName = new TextView(this);
-            tvName.setText(" "+lname+" ");
+            tvName.setText(" " + lname + " ");
             tvName.setTextSize(25);
 
             tvName.setOnClickListener(new View.OnClickListener() {
@@ -184,5 +209,78 @@ public class GalleryActivity extends Activity {
                 startActivity(it);
             }
         });
+    }
+
+
+
+    private void uploadImage(final String fileName) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String token = Token.createToken(new Date().getTime() + 3600, 15348, "{\"height\":\"h\",\"width\":\"w\",\"s_url\":\"url\"}");
+                String filePath = fileName;//Environment.getExternalStorageDirectory() + "/dlion/20141023121127.jpg";
+                String result = PostImage.doUpload(new File(filePath), token);
+                Message msg=new Message();
+                msg.what=10;
+                msg.obj=result;
+                handler.sendMessage(msg);
+
+            }
+        }).start();
+    }
+
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK && null != data) {
+            String sdState = Environment.getExternalStorageState();
+            if (!sdState.equals(Environment.MEDIA_MOUNTED)) {
+                return;
+            }
+            String name = DateFormat.format("yyyyMMdd_hhmmss", Calendar.getInstance(Locale.CHINA)) + ".jpg";
+            Bundle bundle = data.getExtras();
+            //获取相机返回的数据，并转换为图片格式
+            Bitmap bitmap = (Bitmap) bundle.get("data");
+            bitmap = Bitmap.createScaledBitmap(bitmap, 640, 480, true);
+            FileOutputStream fout = null;
+            File file = new File(Environment.getExternalStorageDirectory() + "/dlion");
+            file.mkdirs();
+            final String filename = file.getPath() + "/" + name;
+
+            try {
+                fout = new FileOutputStream(filename);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fout);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    fout.flush();
+                    fout.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            //显示图片
+            uploadImage(filename);
+        }
+    }
+
+    protected void letCamera() {
+        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(camera, 1);
+    }
+
+    @Override
+    public boolean handleMessage(Message message) {
+        try {
+            String result=message.obj.toString();
+            JSONObject jobj = new JSONObject(result);
+            shiTu(jobj.getString("url"));
+            Log.i("UPLOAD IMAGE", result);
+        } catch (Exception e) {
+
+        }
+        return false;
     }
 }

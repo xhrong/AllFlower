@@ -11,4 +11,11 @@
             android:gravity="center_horizontal|center"
             android:layout_height="wrap_content"
             android:id="@+id/imgBtnShiTu"/>
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:src="@drawable/shitu"
+            android:background="#00000000"
+            android:gravity="center_horizontal|center"
+            android:layout_height="wrap_content"
+            android:id="@+id/imgBtnLocalShiTu"/>
 </LinearLayout>

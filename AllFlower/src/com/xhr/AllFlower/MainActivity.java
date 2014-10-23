@@ -7,6 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,17 +25,17 @@ import com.iflytek.iFramework.ui.universalimageloader.core.ImageLoader;
 import com.iflytek.iFramework.ui.universalimageloader.core.assist.FailReason;
 import com.iflytek.iFramework.ui.universalimageloader.core.listener.ImageLoadingListener;
 import com.iflytek.iFramework.utils.StringUtils;
+import com.tietuku.entity.main.PostImage;
+import com.tietuku.entity.token.Token;
 import com.xhr.AllFlower.model.ImageInfo;
 import com.xhr.AllFlower.utils.ScreenUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
+import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by xhrong on 2014/9/23.
@@ -41,9 +44,9 @@ public class MainActivity extends Activity {
 
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
- //   private PullToRefreshGridView pullToRefreshGridView;
+    //   private PullToRefreshGridView pullToRefreshGridView;
     private MultiColumnListView multiColumnListView;
- //   private GridView gridView;
+    //   private GridView gridView;
     private SearchView svSearch;
 
     private ListView lvFlowerName;
@@ -71,7 +74,7 @@ public class MainActivity extends Activity {
                     setCurrentFlowerName(AppConstants.DEFAULT_FLOWER_NAME);
                 } else
                     setCurrentFlowerName(s);
-                curPage=1;
+                curPage = 1;
                 new GetDataTask().execute();
                 return false;
             }
@@ -80,11 +83,12 @@ public class MainActivity extends Activity {
             public boolean onQueryTextChange(String s) {
                 return false;
             }
+
+
         });
 
 
-        multiColumnListView=(MultiColumnListView)findViewById(R.id.ptrgvList);
-
+        multiColumnListView = (MultiColumnListView) findViewById(R.id.ptrgvList);
 
 
         multiColumnListView.setOnLoadMoreListener(new MultiColumnListView.OnLoadMoreListener() {
@@ -95,12 +99,11 @@ public class MainActivity extends Activity {
         });
 
 
-
         TextView tv = new TextView(this);
         tv.setGravity(Gravity.CENTER);
-    //    pullToRefreshGridView.setEmptyView(tv);
+        //    pullToRefreshGridView.setEmptyView(tv);
         adapter = new PullToRefreshAdapter(imageList, this);
-      //  gridView.setAdapter(adapter);
+        //  gridView.setAdapter(adapter);
         multiColumnListView.setAdapter(adapter);
         new GetDataTask().execute();
     }
@@ -120,21 +123,21 @@ public class MainActivity extends Activity {
         menu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
             @Override
             public void onOpen() {
-                tagLayout=(FrameLayout)findViewById(R.id.tagLayout);
-                if(tagLayout.getChildCount()>0)return;
-                List<Tag> myTagList= createTags();
-                mTagCloudView = new TagCloudView(MainActivity.this,    tagLayout.getWidth(),tagLayout.getHeight(), myTagList,new TagCloudView.OnTagClickListener() {
+                tagLayout = (FrameLayout) findViewById(R.id.tagLayout);
+                if (tagLayout.getChildCount() > 0) return;
+                List<Tag> myTagList = createTags();
+                mTagCloudView = new TagCloudView(MainActivity.this, tagLayout.getWidth(), tagLayout.getHeight(), myTagList, new TagCloudView.OnTagClickListener() {
                     @Override
-                    public void onTagClick(TagCloudView tagCloudView,View view, int position) {
-                        String data=tagCloudView.getTagCloud().get(position).getText();
+                    public void onTagClick(TagCloudView tagCloudView, View view, int position) {
+                        String data = tagCloudView.getTagCloud().get(position).getText();
                         imageList.clear();
                         if (StringUtils.isEmpty(data)) {
                             setCurrentFlowerName(AppConstants.DEFAULT_FLOWER_NAME);
                         } else
                             setCurrentFlowerName(data);
-                        curPage=1;
+                        curPage = 1;
                         new GetDataTask().execute();
-                        Toast.makeText(MainActivity.this,data,Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, data, Toast.LENGTH_LONG).show();
                     }
                 }); //通过当前上下文
                 tagLayout.addView(mTagCloudView);
@@ -153,7 +156,7 @@ public class MainActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 imageList.clear();
                 setCurrentFlowerName(AppConstants.FLOWER_NAMES[i]);
-                curPage=1;
+                curPage = 1;
                 new GetDataTask().execute();
             }
         });
@@ -162,11 +165,13 @@ public class MainActivity extends Activity {
         btnRandom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Random random = new Random();
-                setCurrentFlowerName(AppConstants.FLOWER_NAMES[random.nextInt(AppConstants.FLOWER_NAMES.length)]);
-                imageList.clear();
-                curPage=1;
-                new GetDataTask().execute();
+//                Random random = new Random();
+//                setCurrentFlowerName(AppConstants.FLOWER_NAMES[random.nextInt(AppConstants.FLOWER_NAMES.length)]);
+//                imageList.clear();
+//                curPage = 1;
+//                new GetDataTask().execute();
+
+                letCamera();
             }
         });
 
@@ -307,7 +312,6 @@ public class MainActivity extends Activity {
         }
 
 
-
     }
 
 
@@ -359,15 +363,14 @@ public class MainActivity extends Activity {
             imageList.addAll(result);
             adapter.notifyDataSetChanged();
             curPage++;
-          //  pullToRefreshGridView.onRefreshComplete();
+            //  pullToRefreshGridView.onRefreshComplete();
             multiColumnListView.onLoadMoreComplete();
             super.onPostExecute(result);
         }
     }
 
 
-
-    private List<Tag> createTags(){
+    private List<Tag> createTags() {
 
         List<Tag> tempList = new ArrayList<Tag>();
 
@@ -383,8 +386,89 @@ public class MainActivity extends Activity {
         tempList.add(new Tag("梨花", 8));
         tempList.add(new Tag("樱花", 5));
         tempList.add(new Tag("茶花", 1));
+        tempList.add(new Tag("菊花", 3));
+        tempList.add(new Tag("百合1", 4));
+        tempList.add(new Tag("秋海棠2", 5));
+        tempList.add(new Tag("杏花3", 5));
+        tempList.add(new Tag("梅花3", 7));
+        tempList.add(new Tag("金银花3", 3));
+        tempList.add(new Tag("紫3藤花", 5));
+        tempList.add(new Tag("油3菜花", 3));
+        tempList.add(new Tag("梨3花", 8));
+        tempList.add(new Tag("樱3花", 5));
+        tempList.add(new Tag("茶3花", 1));
+        tempList.add(new Tag("菊3花", 3));
+        tempList.add(new Tag("3百合", 4));
+        tempList.add(new Tag("3秋海棠", 5));
+        tempList.add(new Tag("3杏花", 5));
+        tempList.add(new Tag("3梅花", 7));
+        tempList.add(new Tag("3金银花", 3));
+        tempList.add(new Tag("3紫藤花", 5));
+        tempList.add(new Tag("3油菜花", 3));
+        tempList.add(new Tag("4梨花", 8));
+        tempList.add(new Tag("樱5花", 5));
+        tempList.add(new Tag("茶6花", 1));
         return tempList;
     }
 
     private TagCloudView mTagCloudView;
+
+
+    private void uploadImage(final String fileName) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String token = Token.createToken(new Date().getTime() + 3600, 15348, "{\"height\":\"h\",\"width\":\"w\",\"s_url\":\"url\"}");
+                String filePath = fileName;//Environment.getExternalStorageDirectory() + "/dlion/20141023121127.jpg";
+                String result = PostImage.doUpload(new File(filePath), token);
+
+                //
+                Log.i("UPLOAD IMAGE", result);
+            }
+        }).start();
+    }
+
+
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 1 && resultCode == Activity.RESULT_OK && null != data){
+            String sdState=Environment.getExternalStorageState();
+            if(!sdState.equals(Environment.MEDIA_MOUNTED)){
+                return;
+            }
+            String name= DateFormat.format("yyyyMMdd_hhmmss", Calendar.getInstance(Locale.CHINA))+".jpg";
+            Bundle bundle = data.getExtras();
+            //获取相机返回的数据，并转换为图片格式
+            Bitmap bitmap = (Bitmap)bundle.get("data");
+            bitmap = Bitmap.createScaledBitmap(bitmap, 640, 480, true);
+            FileOutputStream fout = null;
+            File file = new File(Environment.getExternalStorageDirectory()+"/dlion");
+            file.mkdirs();
+           final  String filename=file.getPath()+"/"+name;
+
+            try {
+                fout = new FileOutputStream(filename);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fout);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }finally{
+                try {
+                    fout.flush();
+                    fout.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            //显示图片
+            uploadImage(filename);
+
+        }
+    }
+
+    protected void letCamera() {
+        Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(camera, 1);
+    }
 }

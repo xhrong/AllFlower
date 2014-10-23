@@ -180,7 +180,7 @@ public class TagCloud implements Iterable{
             tagCloud.get(j).setScale(per);
             tagCloud.get(j).setAlpha(per / 2);
         }
-        depthSort();
+    //    depthSort();
     }
 
     ///now let's sort all tags in the tagCloud based on their z coordinate
